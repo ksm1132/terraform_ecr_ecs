@@ -9,7 +9,7 @@ resource "aws_iam_role" "default" {
 
 data "aws_iam_policy_document" "assume_role" {
   statement {
-    actions = ["sts::AssumeRole"]
+    actions = ["sts:AssumeRole"]
     principals {
       identifiers = [var.identifier]
       type        = "Service"
@@ -34,3 +34,15 @@ output "iam_role_arn" {
 output "iam_role_name" {
   value = aws_iam_role.default.name
 }
+
+
+resource "aws_iam_role_policy_attachment" "ecr_power_user" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
+  role       = aws_iam_role.default.name
+}
+
+resource "aws_iam_role_policy_attachment" "ecr_full" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+  role       = aws_iam_role.default.name
+}
+

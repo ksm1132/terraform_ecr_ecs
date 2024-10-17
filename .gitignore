@@ -37,3 +37,6 @@ override.tf.json
 terraform.rc
 
 terraform.exe
+
+variables.tf
+SSM.tf

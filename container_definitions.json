@@ -1,0 +1,13 @@
+[
+  {
+    "name": "ims-app",
+    "image": "${var.aws_account_id}.dkr.ecr.${var.region}.amazonaws.com/${var.repository_name}:app-latest",
+    "essential": true,
+    "portMappings": [
+      {
+        "protocol": "tcp",
+        "containerPort": 8080
+      }
+    ]
+  }
+]
