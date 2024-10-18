@@ -2,6 +2,36 @@ resource "aws_ecs_cluster" "ims_app" {
   name = "ims-app"
 }
 
+module "ecs_task_execution_role" {
+  source = "./iam_role"
+  name = "ecs-task-execution"
+  identifier = "ecs-tasks.amazonaws.com"
+  policy = data.aws_iam_policy_document.ecs_task_execution.json
+}
+
+module "ecs_events_role" {
+  source = "./iam_role"
+  name = "ecs-events"
+  identifier = "events.amazonaws.com"
+  policy = data.aws_iam_policy.ecs_events_role_policy.policy
+}
+
+data "aws_iam_policy" "ecs_events_role_policy" {
+  arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceEventsRole"
+}
+
+data "aws_ssm_parameter" "POSTGRES_ENDPOINT" {
+  name = "/ims-app/POSTGRES_ENDPOINT"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "POSTGRES_DB" {
+  name = "/ims-app/POSTGRES_DB"
+  with_decryption = true
+}
+
+
+
 resource "aws_ecs_task_definition" "ims_app" {
 #   container_definitions = file("./container_definitions.json")
   container_definitions = jsonencode([
@@ -11,19 +41,19 @@ resource "aws_ecs_task_definition" "ims_app" {
       environment = [
         {
           name  = "POSTGRES_ENDPOINT"
-          value = "jdbc:postgresql://${var.rds_endpoint}:5432/your-database-name"
+          value = data.aws_ssm_parameter.POSTGRES_ENDPOINT.value
         },
         {
           name = "POSTGRES_DB"
-          value = "your-database-name"
+          value = data.aws_ssm_parameter.POSTGRES_DB.value
         },
         {
-          name  = "POSTGRES_USERNAME"
-          value = "your-username"
+          name  = "POSTGRES_USER"
+          value = data.aws_ssm_parameter.POSTGRES_USERNAME.value
         },
         {
           name  = "POSTGRES_PASSWORD"
-          value = "your-password"
+          value = data.aws_ssm_parameter.POSTGRES_PASSWORD.value
         }
       ],
       essential = true,
@@ -55,8 +85,8 @@ resource "aws_ecs_service" "ims_app" {
   name = "ims-app"
   cluster = aws_ecs_cluster.ims_app.arn
   task_definition = aws_ecs_task_definition.ims_app.arn
-  desired_count = 2
-  platform_version = "1.3.0"
+  desired_count = 1
+  platform_version = "1.4.0"
   launch_type = "FARGATE"
   health_check_grace_period_seconds =60
 

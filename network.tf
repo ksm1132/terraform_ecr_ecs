@@ -63,46 +63,79 @@ resource "aws_subnet" "private_1" {
   map_public_ip_on_launch = false
 }
 
-resource "aws_route_table" "private_0" {
+#resource "aws_route_table" "private_0" {
+#  vpc_id = aws_vpc.ims_app.id
+#}
+#
+#resource "aws_route_table" "private_1" {
+#  vpc_id = aws_vpc.ims_app.id
+#}
+
+resource "aws_route_table" "private" {
   vpc_id = aws_vpc.ims_app.id
 }
 
-resource "aws_route_table" "private_1" {
-  vpc_id = aws_vpc.ims_app.id
-}
+#resource "aws_route" "private" {
+#   route_table_id = aws_route_table.private.id
+#   destination_cidr_block = "0.0.0.0/0"
+# }
 
-# resource "aws_route" "private_0" {
+
+#resource "aws_route" "private_0" {
 #   route_table_id = aws_route_table.private_0.id
-#   nat_gateway_id = aws_nat_gateway.ims_app.id
+#   nat_gateway_id = aws_nat_gateway.ims_app_0.id
 #   destination_cidr_block = "0.0.0.0/0"
 # }
-
-# resource "aws_route" "private_1" {
+#
+#resource "aws_route" "private_1" {
 #   route_table_id = aws_route_table.private_1.id
-#   nat_gateway_id = aws_nat_gateway.ims_app.id
+#   nat_gateway_id = aws_nat_gateway.ims_app_1.id
 #   destination_cidr_block = "0.0.0.0/0"
 # }
 
-resource "aws_route_table_association" "private_0" {
-  route_table_id = aws_route_table.private_0.id
+
+resource "aws_route_table_association" "private" {
+  route_table_id = aws_route_table.private.id
   subnet_id = aws_subnet.private_0.id
 }
 
 resource "aws_route_table_association" "private_1" {
-  route_table_id = aws_route_table.private_1.id
+  route_table_id = aws_route_table.private.id
   subnet_id = aws_subnet.private_1.id
 }
 
-##################NAT GATEWAY  不要
+resource "aws_vpc_endpoint" "cloudwatch_logs" {
+  vpc_id            = aws_vpc.ims_app.id
+  service_name      = "com.amazonaws.${var.region}.logs"
+  vpc_endpoint_type = "Interface"
+  subnet_ids        = [aws_subnet.private_0.id, aws_subnet.private_1.id]
+  security_group_ids = [aws_security_group.ims_app.id]
 
-# resource "aws_eip" "nat_gateway" {
+  tags = {
+    Name = "CloudWatch Logs VPC Endpoint"
+  }
+}
+
+##################NAT GATEWAY やっぱ要る（ログ送信 →さらにvpcエンドポイントに変更の為不要
+
+# resource "aws_eip" "nat_gateway_0" {
 #   depends_on = [aws_internet_gateway.ims_app]
 # }
 #
-# resource "aws_nat_gateway" "ims_app" {
-#   allocation_id = aws_eip.nat_gateway.id
+#resource "aws_eip" "nat_gateway_1" {
+#  depends_on = [aws_internet_gateway.ims_app]
+#}
+#
+#resource "aws_nat_gateway" "ims_app_0" {
+#   allocation_id = aws_eip.nat_gateway_0.id
 #   subnet_id     = aws_subnet.public_0.id
 #   depends_on = [aws_internet_gateway.ims_app]
 # }
+#
+#resource "aws_nat_gateway" "ims_app_1" {
+#  allocation_id = aws_eip.nat_gateway_1.id
+#  subnet_id     = aws_subnet.public_1.id
+#  depends_on = [aws_internet_gateway.ims_app]
+#}
 
 
