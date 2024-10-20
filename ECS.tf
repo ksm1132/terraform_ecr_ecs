@@ -88,11 +88,11 @@ resource "aws_ecs_service" "ims_app" {
   desired_count = 1
   platform_version = "1.4.0"
   launch_type = "FARGATE"
-  health_check_grace_period_seconds =60
+  health_check_grace_period_seconds = 60
 
   network_configuration {
     assign_public_ip = false
-    security_groups = [module.ims_app_sg.security_group_id]
+    security_groups = [module.postgres_sg.security_group_id, module.http_redirect_sg.security_group_id]
     subnets = [aws_subnet.private_0.id, aws_subnet.private_1.id]
   }
 

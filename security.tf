@@ -20,3 +20,12 @@ resource "aws_security_group_rule" "egress_ims_app" {
   type              = "egress"
   cidr_blocks = ["0.0.0.0/0"]
 }
+
+resource "aws_security_group_rule" "ingress_postgres" {
+  type                    = "ingress"
+  from_port              = 5432
+  to_port                = 5432
+  protocol               = "tcp"
+  security_group_id      = module.postgres_sg.security_group_id
+  source_security_group_id = module.ims_app_sg.security_group_id
+}
