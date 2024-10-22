@@ -3,14 +3,14 @@ resource "aws_ecs_cluster" "ims_app" {
 }
 
 module "ecs_task_execution_role" {
-  source = "./iam_role"
+  source = "../iam_role"
   name = "ecs-task-execution"
   identifier = "ecs-tasks.amazonaws.com"
   policy = data.aws_iam_policy_document.ecs_task_execution.json
 }
 
 module "ecs_events_role" {
-  source = "./iam_role"
+  source = "../iam_role"
   name = "ecs-events"
   identifier = "events.amazonaws.com"
   policy = data.aws_iam_policy.ecs_events_role_policy.policy
@@ -48,7 +48,7 @@ resource "aws_ecs_task_definition" "ims_app" {
           value = data.aws_ssm_parameter.POSTGRES_DB.value
         },
         {
-          name  = "POSTGRES_USER"
+          name  = "POSTGRES_USERNAME"
           value = data.aws_ssm_parameter.POSTGRES_USERNAME.value
         },
         {

@@ -49,7 +49,7 @@ resource "aws_db_instance" "ims_app" {
   max_allocated_storage   = 100
   storage_type           = "gp3"
   storage_encrypted      = true
-#   kms_key_id             = aws_kms_key.ims_app.arn
+  kms_key_id             = aws_kms_key.ims_app.arn
   username               = data.aws_ssm_parameter.POSTGRES_USERNAME.value
   password               = data.aws_ssm_parameter.POSTGRES_PASSWORD.value
   multi_az               = true
