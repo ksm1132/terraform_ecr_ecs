@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "ims_app" {
-  name = "ims-app"
+  name = "ims-app3"
 }
 
 module "ecs_task_execution_role" {
@@ -41,19 +41,19 @@ resource "aws_ecs_task_definition" "ims_app" {
       environment = [
         {
           name  = "POSTGRES_ENDPOINT"
-          value = data.aws_ssm_parameter.POSTGRES_ENDPOINT.value
+          value = aws_ssm_parameter.POSTGRES_ENDPOINT.value
         },
         {
-          name = "POSTGRES_DB"
-          value = data.aws_ssm_parameter.POSTGRES_DB.value
+          name  = "POSTGRES_DB"
+          value = aws_ssm_parameter.POSTGRES_DB.value
         },
         {
           name  = "POSTGRES_USERNAME"
-          value = data.aws_ssm_parameter.POSTGRES_USERNAME.value
+          value = aws_ssm_parameter.POSTGRES_USERNAME.value
         },
         {
           name  = "POSTGRES_PASSWORD"
-          value = data.aws_ssm_parameter.POSTGRES_PASSWORD.value
+          value = aws_ssm_parameter.POSTGRES_PASSWORD.value
         }
       ],
       essential = true,
@@ -88,11 +88,11 @@ resource "aws_ecs_service" "ims_app" {
   desired_count = 1
   platform_version = "1.4.0"
   launch_type = "FARGATE"
-  health_check_grace_period_seconds = 60
+  health_check_grace_period_seconds = 3600
 
   network_configuration {
     assign_public_ip = false
-    security_groups = [module.postgres_sg.security_group_id, module.http_redirect_sg.security_group_id]
+    security_groups = [module.ims_app_sg.security_group_id]
     subnets = [aws_subnet.private_0.id, aws_subnet.private_1.id]
   }
 
@@ -128,9 +128,9 @@ data "aws_iam_policy_document" "ecs_task_execution" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "for_ecs" {
-  name = "/ecs/ims-app"
-  retention_in_days = 180
-}
+# resource "aws_cloudwatch_log_group" "for_ecs" {
+#   name = "/ecs/ims-app"
+#   retention_in_days = 180
+# }
 
 

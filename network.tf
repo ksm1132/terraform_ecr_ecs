@@ -175,6 +175,27 @@ resource "aws_vpc_endpoint" "ssm" {
   private_dns_enabled = true
 }
 
+resource "aws_vpc_endpoint" "ssmmessages" {
+  service_name = "com.amazonaws.${var.region}.ssmmessages"
+  vpc_id       = aws_vpc.ims_app.id
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [aws_subnet.private_0.id, aws_subnet.private_1.id]
+  security_group_ids = [aws_security_group.vpc_endpoint.id]
+  private_dns_enabled = true
+}
+
+resource "aws_vpc_endpoint" "ec2messages" {
+  service_name = "com.amazonaws.${var.region}.ec2messages"
+  vpc_id       = aws_vpc.ims_app.id
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [aws_subnet.private_0.id, aws_subnet.private_1.id]
+  security_group_ids = [aws_security_group.vpc_endpoint.id]
+  private_dns_enabled = true
+}
+
+
+
+
 
 
 
