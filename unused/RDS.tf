@@ -38,8 +38,6 @@ data "aws_ssm_parameter" "POSTGRES_PASSWORD" {
   with_decryption = true
 }
 
-
-
 resource "aws_db_instance" "ims_app" {
   instance_class          = "db.t4g.micro"
   identifier              = "ims-app"

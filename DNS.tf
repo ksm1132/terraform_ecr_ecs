@@ -1,5 +1,5 @@
 data "aws_route53_zone" "ims_app" {
-  name = "mk3te.wjg.jp"
+  name = "tensaimaemukipositive.com"
 }
 
 resource "aws_route53_record" "ims_app" {

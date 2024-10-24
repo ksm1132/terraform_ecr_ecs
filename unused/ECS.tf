@@ -30,6 +30,31 @@ data "aws_ssm_parameter" "POSTGRES_DB" {
   with_decryption = true
 }
 
+data "aws_ssm_parameter" "GOOGLE_CLIENT_ID" {
+  name = "/ims-app/GOOGLE_CLIENT_ID"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "GOOGLE_CLIENT_SECRET" {
+  name = "/ims-app/GOOGLE_CLIENT_SECRET"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "myappDomain" {
+  name = "/ims-app/myappDomain"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "EMAIL_ADDRESS" {
+  name = "/ims-app/EMAIL_ADDRESS"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "EMAIL_PASSWORD" {
+  name = "/ims-app/EMAIL_PASSWORD"
+  with_decryption = true
+}
+
 
 
 resource "aws_ecs_task_definition" "ims_app" {
@@ -54,6 +79,26 @@ resource "aws_ecs_task_definition" "ims_app" {
         {
           name  = "POSTGRES_PASSWORD"
           value = aws_ssm_parameter.POSTGRES_PASSWORD.value
+        },
+        {
+          name  = "GOOGLE_CLIENT_ID"
+          value = aws_ssm_parameter.GOOGLE_CLIENT_ID.value
+        },
+        {
+          name  = "GOOGLE_CLIENT_SECRET"
+          value = aws_ssm_parameter.GOOGLE_CLIENT_SECRET.value
+        },
+        {
+          name  = "myappDomain"
+          value = aws_ssm_parameter.myappDomain.value
+        },
+        {
+          name  = "EMAIL_ADDRESS"
+          value = aws_ssm_parameter.EMAIL_ADDRESS.value
+        },
+        {
+          name  = "EMAIL_PASSWORD"
+          value = aws_ssm_parameter.EMAIL_PASSWORD.value
         }
       ],
       essential = true,

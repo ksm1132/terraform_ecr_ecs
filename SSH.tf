@@ -46,7 +46,7 @@ resource "aws_instance" "ims_app_for_operation" {
   iam_instance_profile = aws_iam_instance_profile.ec2_for_ssm.name
   subnet_id = aws_subnet.private_0.id
   security_groups = [module.https_sg.security_group_id]
-  user_data = "file(./user_data.sh)"
+  user_data = file("./user_data.sh")
 }
 
 output "operation_instance_id" {
