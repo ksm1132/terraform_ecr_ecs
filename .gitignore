@@ -39,4 +39,3 @@ terraform.rc
 terraform.exe
 
 variables.tf
-unused/SSM.tf

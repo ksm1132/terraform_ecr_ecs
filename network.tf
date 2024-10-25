@@ -63,44 +63,44 @@ resource "aws_subnet" "private_1" {
   map_public_ip_on_launch = false
 }
 
-# resource "aws_route_table" "private_0" {
-#  vpc_id = aws_vpc.ims_app.id
-# }
-#
-# resource "aws_route_table" "private_1" {
-#  vpc_id = aws_vpc.ims_app.id
-# }
-
-resource "aws_route_table" "private" {
+ resource "aws_route_table" "private_0" {
   vpc_id = aws_vpc.ims_app.id
-}
+ }
+
+ resource "aws_route_table" "private_1" {
+  vpc_id = aws_vpc.ims_app.id
+ }
+
+#resource "aws_route_table" "private" {
+#  vpc_id = aws_vpc.ims_app.id
+#}
 
 #resource "aws_route" "private" {
-#   route_table_id = aws_route_table.private.id
-#   destination_cidr_block = "0.0.0.0/0"
-# }
+#  route_table_id = aws_route_table.private.id
+#  destination_cidr_block = "0.0.0.0/0"
+#}
 
 
-#resource "aws_route" "private_0" {
-#   route_table_id = aws_route_table.private_0.id
-#   nat_gateway_id = aws_nat_gateway.ims_app_0.id
-#   destination_cidr_block = "0.0.0.0/0"
-# }
-#
-#resource "aws_route" "private_1" {
-#   route_table_id = aws_route_table.private_1.id
-#   nat_gateway_id = aws_nat_gateway.ims_app_1.id
-#   destination_cidr_block = "0.0.0.0/0"
-# }
+resource "aws_route" "private_0" {
+   route_table_id = aws_route_table.private_0.id
+   nat_gateway_id = aws_nat_gateway.ims_app_0.id
+   destination_cidr_block = "0.0.0.0/0"
+ }
+
+resource "aws_route" "private_1" {
+   route_table_id = aws_route_table.private_1.id
+   nat_gateway_id = aws_nat_gateway.ims_app_1.id
+   destination_cidr_block = "0.0.0.0/0"
+ }
 
 
 resource "aws_route_table_association" "private_0" {
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private_0.id
   subnet_id = aws_subnet.private_0.id
 }
 
 resource "aws_route_table_association" "private_1" {
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private_1.id
   subnet_id = aws_subnet.private_1.id
 }
 
@@ -113,7 +113,12 @@ resource "aws_vpc_endpoint" "s3" {
 }
 
 resource "aws_vpc_endpoint_route_table_association" "private_s3" {
-  route_table_id  = aws_route_table.private.id
+#  route_table_id  = aws_route_table.private.id
+  for_each = {
+    rt1 = aws_route_table.private_0.id
+    rt2 = aws_route_table.private_1.id
+  }
+  route_table_id = each.value
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
 }
 
@@ -199,26 +204,26 @@ resource "aws_vpc_endpoint" "ec2messages" {
 
 
 
-##################NAT GATEWAY やっぱ要る（ログ送信 →さらにvpcエンドポイントに変更の為不要
+##################NAT GATEWAY やっぱ要る（ECSがプライベートセグメントのため、SMTP送信に必要だった( ﾉД`)ｼｸｼｸ…
 
-# resource "aws_eip" "nat_gateway_0" {
-#   depends_on = [aws_internet_gateway.ims_app]
-# }
-#
-#resource "aws_eip" "nat_gateway_1" {
-#  depends_on = [aws_internet_gateway.ims_app]
-#}
-#
-#resource "aws_nat_gateway" "ims_app_0" {
-#   allocation_id = aws_eip.nat_gateway_0.id
-#   subnet_id     = aws_subnet.public_0.id
-#   depends_on = [aws_internet_gateway.ims_app]
-# }
-#
-#resource "aws_nat_gateway" "ims_app_1" {
-#  allocation_id = aws_eip.nat_gateway_1.id
-#  subnet_id     = aws_subnet.public_1.id
-#  depends_on = [aws_internet_gateway.ims_app]
-#}
+resource "aws_eip" "nat_gateway_0" {
+  depends_on = [aws_internet_gateway.ims_app]
+}
+
+resource "aws_eip" "nat_gateway_1" {
+  depends_on = [aws_internet_gateway.ims_app]
+}
+
+resource "aws_nat_gateway" "ims_app_0" {
+   allocation_id = aws_eip.nat_gateway_0.id
+   subnet_id     = aws_subnet.public_0.id
+   depends_on = [aws_internet_gateway.ims_app]
+}
+
+resource "aws_nat_gateway" "ims_app_1" {
+  allocation_id = aws_eip.nat_gateway_1.id
+  subnet_id     = aws_subnet.public_1.id
+  depends_on = [aws_internet_gateway.ims_app]
+}
 
 ###
