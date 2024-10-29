@@ -1,5 +1,6 @@
 resource "aws_ecr_repository" "ims_repo" {
   name = "ims-app"
+  force_delete = true
 }
 
 resource "aws_ecr_lifecycle_policy" "ims_repo" {
