@@ -124,6 +124,7 @@ resource "aws_ecs_task_definition" "ims_app" {
   network_mode = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   execution_role_arn = module.ecs_task_execution_role.iam_role_arn
+  task_role_arn = module.ecs_task_execution_role.iam_role_arn
 }
 
 resource "aws_ecs_service" "ims_app" {
